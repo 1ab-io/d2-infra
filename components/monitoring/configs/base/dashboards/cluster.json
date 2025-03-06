@@ -95,7 +95,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "count(gotk_resource_info{exported_namespace=~\"$namespace\", customresource_kind=~\"Kustomization|HelmRelease\"})",
+          "expr": "count(flux_resource_info{exported_namespace=~\"$namespace\", kind=~\"Kustomization|HelmRelease\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -161,7 +161,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "count(gotk_resource_info{exported_namespace=~\"$namespace\", customresource_kind=~\"Kustomization|HelmRelease\", ready=\"False\"})",
+          "expr": "count(flux_resource_info{exported_namespace=~\"$namespace\", kind=~\"Kustomization|HelmRelease\", ready=\"False\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -231,7 +231,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "count(gotk_resource_info{exported_namespace=~\"$namespace\", customresource_kind=~\"GitRepository|HelmRepository|Bucket|OCIRepository\"})",
+          "expr": "count(flux_resource_info{exported_namespace=~\"$namespace\", kind=~\"GitRepository|HelmRepository|Bucket|OCIRepository\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -297,7 +297,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "count(gotk_resource_info{exported_namespace=~\"$namespace\", customresource_kind=~\"GitRepository|HelmRepository|Bucket|OCIRepository\", ready=\"False\"})",
+          "expr": "count(flux_resource_info{exported_namespace=~\"$namespace\", kind=~\"GitRepository|HelmRepository|Bucket|OCIRepository\", ready=\"False\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -543,7 +543,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "gotk_resource_info{exported_namespace=~\"$namespace\", customresource_kind=~\"Kustomization|HelmRelease\"}",
+          "expr": "flux_resource_info{exported_namespace=~\"$namespace\", kind=~\"Kustomization|HelmRelease\"}",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -593,22 +593,20 @@
               "customresource_kind": 5,
               "customresource_version": 6,
               "endpoint": 7,
-              "exported_namespace": 3,
+              "kind": 3,
               "instance": 8,
               "job": 9,
-              "name": 10,
-              "namespace": 11,
+              "name": 11,
+              "exported_namespace": 10,
               "pod": 12,
               "ready": 13,
               "service": 14
             },
             "renameByName": {
               "Value": "",
-              "customresource_kind": "Kind",
-              "exported_namespace": "Namespace",
               "kind": "Kind",
+              "exported_namespace": "Namespace",
               "name": "Name",
-              "namespace": "Operator Namespace",
               "ready": "Status"
             }
           }
@@ -617,7 +615,7 @@
           "id": "filterFieldsByName",
           "options": {
             "include": {
-              "pattern": "(Namespace|Kind|Name|Status)"
+              "pattern": "(Kind|Namespace|Name|Status)"
             }
           }
         }
@@ -741,7 +739,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "gotk_resource_info{exported_namespace=~\"$namespace\", customresource_kind=~\"GitRepository|HelmRepository|Bucket|OCIRepository\"}",
+          "expr": "flux_resource_info{exported_namespace=~\"$namespace\", kind=~\"GitRepository|HelmRepository|Bucket|OCIRepository\"}",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -795,18 +793,16 @@
               "instance": 9,
               "job": 10,
               "name": 11,
-              "namespace": 3,
+              "kind": 3,
               "pod": 12,
               "ready": 13,
               "service": 14
             },
             "renameByName": {
               "Value": "",
-              "customresource_kind": "Kind",
-              "exported_namespace": "Namespace",
               "kind": "Kind",
+              "exported_namespace": "Namespace",
               "name": "Name",
-              "namespace": "Operator Namespace",
               "ready": "Status"
             }
           }
@@ -815,7 +811,7 @@
           "id": "filterFieldsByName",
           "options": {
             "include": {
-              "pattern": "(Namespace|Kind|Name|Status)"
+              "pattern": "(Kind|Namespace|Name|Status)"
             }
           }
         }
@@ -904,7 +900,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "gotk_resource_info{exported_namespace=~\"$namespace\", suspended=\"true\"}",
+          "expr": "flux_resource_info{exported_namespace=~\"$namespace\", suspended=\"True\"}",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -959,13 +955,13 @@
               "instance": 9,
               "job": 10,
               "name": 11,
-              "namespace": 3,
+              "kind": 3,
               "pod": 12,
               "ready": 13,
               "service": 14
             },
             "renameByName": {
-              "customresource_kind": "Kind",
+              "kind": "Kind",
               "exported_namespace": "Namespace",
               "name": "Name"
             }
@@ -975,7 +971,7 @@
           "id": "filterFieldsByName",
           "options": {
             "include": {
-              "pattern": "(Namespace|Name|Kind)"
+              "pattern": "(Kind|Namespace|Name)"
             }
           }
         }
@@ -1318,14 +1314,14 @@
           "type": "prometheus",
           "uid": "$DS_PROMETHEUS"
         },
-        "definition": "label_values(gotk_resource_info,exported_namespace)",
+        "definition": "label_values(flux_resource_info,exported_namespace)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "namespace",
         "options": [],
         "query": {
-          "query": "label_values(gotk_resource_info,exported_namespace)",
+          "query": "label_values(flux_resource_info,exported_namespace)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
