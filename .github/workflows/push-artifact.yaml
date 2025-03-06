@@ -13,6 +13,7 @@ jobs:
       matrix:
         component:
           - cert-manager
+          - monitoring
     runs-on: ubuntu-latest
     permissions:
       contents: read
