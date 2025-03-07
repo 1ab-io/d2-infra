@@ -47,7 +47,7 @@ jobs:
           repository: ghcr.io/${{ github.repository }}/${{ steps.prep.outputs.component }}
           path: "./components/${{ steps.prep.outputs.component }}"
           diff-tag: ${{ steps.prep.outputs.version }}
-          tags: production
+          tags: latest-stable
       - name: Sign artifact
         if: steps.push.outputs.pushed == 'true'
         run: cosign sign --yes $DIGEST_URL
