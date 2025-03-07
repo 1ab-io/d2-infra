@@ -6,6 +6,7 @@ on:
 
 jobs:
   pull-request:
+    if: github.ref_name == 'image-updates'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
