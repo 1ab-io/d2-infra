@@ -4,6 +4,7 @@ namespace: monitoring
 resources:
   - podmonitor.yaml
   - servicemonitor.yaml
+  - rbac.yaml
 configMapGenerator:
   - name: flux-grafana-dashboards
     files:
