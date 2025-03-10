@@ -20,9 +20,5 @@ spec:
     name: metrics-server
   # https://artifacthub.io/packages/helm/bitnami/metrics-server
   values:
-    global:
-      imageRegistry: public.ecr.aws
-      security:
-        allowInsecureImages: true
     extraArgs:
       - --kubelet-insecure-tls
