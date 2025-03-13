@@ -1,14 +1,15 @@
 name: image-updates
 
 on:
+  workflow_dispatch:
   create:
-    branches: [image-updates]
 
 jobs:
   pull-request:
     if: github.ref_name == 'image-updates'
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - name: Checkout
@@ -25,4 +26,4 @@ jobs:
             --repo=${GITHUB_REPO} \
             --head=image-updates \
             --base=main \
-            --fill-first     
+            --fill-first
