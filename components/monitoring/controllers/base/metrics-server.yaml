@@ -4,9 +4,9 @@ metadata:
   name: metrics-server
 spec:
   interval: 1h
-  url: oci://registry-1.docker.io/bitnamicharts/metrics-server
+  url: oci://ghcr.io/controlplaneio-fluxcd/charts/metrics-server
   ref:
-    tag: "7.4.1" # {"$imagepolicy": "infra:metrics-server:tag"}
+    tag: "3.12.2" # {"$imagepolicy": "infra:metrics-server:tag"}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -18,7 +18,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: metrics-server
-  # https://artifacthub.io/packages/helm/bitnami/metrics-server
+  # https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/values.yaml
   values:
-    extraArgs:
+    args:
       - --kubelet-insecure-tls
