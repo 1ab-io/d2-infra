@@ -5,6 +5,9 @@ metadata:
 spec:
   interval: 1h
   url: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
   ref:
     tag: "71.2.0" # {"$imagepolicy": "infra:kube-prometheus-stack:tag"}
 ---
