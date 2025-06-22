@@ -1,0 +1,10 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: cilium
+spec:
+  interval: 1h
+  url: https://helm.cilium.io
+  # ref:
+  #   tag: v1.17.5 # {"$imagepolicy": "infra:cilium:tag"}
