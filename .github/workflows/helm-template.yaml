@@ -1,0 +1,85 @@
+name: helm-template
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/helm-template.yaml
+      - components/cilium/controllers/base/repository.yaml
+      - components/cilium/controllers/base/release.yaml
+      - components/cert-manager/controllers/base/repository.yaml
+      - components/cert-manager/controllers/base/release.yaml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     component:
+    #       - cert-manager
+    #       - cilium
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Set up yq
+        uses: mikefarah/yq@v4
+
+      - name: Render manifests
+        run: |
+          set -eux
+          mkdir -p charts public
+          echo '<h1>Manifests</h1>' >public/index.html
+          echo '<ul>' >>public/index.html
+          # chart="${{ matrix.component }}"
+          for chart in cert-manager cilium; do
+            repo_file="components/$chart/controllers/base/repository.yaml"
+            file="components/$chart/controllers/base/release.yaml"
+            url=$(yq e '.spec.url' "$repo_file")
+            tag=$(yq e '.spec.ref.tag' "$repo_file")
+            name=$(yq e '.spec.releaseName' "$file")
+            yq e '.spec.values' $file >$chart.values.yaml
+            if [[ "$url" == oci://* ]]; then
+              helm pull "$url" --version "$tag" --untar --untardir charts
+            else
+              helm repo add "$chart" "$url"
+              helm repo update
+              helm pull "$chart/$chart" --version "$tag" --untar --untardir charts
+            fi
+            helm template "$name" "charts/$chart" --values "$chart.values.yaml" >"public/$chart.yaml"
+            echo '<a href="'$chart'.yaml">'$chart'</a>' >>public/index.html
+          echo '</ul>' >>public/index.html
+          done
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # name: ${{ matrix.component }}
+          path: public/
+
+      - name: Deploy pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        # with:
+        #   artifact_name: ${{ matrix.component }}
