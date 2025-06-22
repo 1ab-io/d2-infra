@@ -1,0 +1,13 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: talos-cloud-controller-manager
+spec:
+  interval: 1h
+  url: oci://ghcr.io/siderolabs/charts/talos-cloud-controller-manager
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  ref:
+    tag: 0.4.7 # {"$imagepolicy": "infra:talos-ccm:tag"}
