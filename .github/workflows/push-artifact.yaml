@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'main'
+      - "main"
 
 jobs:
   flux-push:
@@ -13,7 +13,12 @@ jobs:
       matrix:
         component:
           - cert-manager
+          - cilium
+          - external-secrets
+          - flux-operator
           - monitoring
+          - talos-ccm
+          - velero
     runs-on: ubuntu-latest
     permissions:
       contents: read
