@@ -1,0 +1,13 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+spec:
+  interval: 1h
+  releaseName: cilium
+  chartRef:
+    kind: OCIRepository
+    name: cilium
+  values:
+    installCRDs: true
