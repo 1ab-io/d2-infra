@@ -3,7 +3,11 @@ name: release-artifact
 on:
   push:
     tags:
-      - '**'
+      - "**"
+    # paths:
+    #   - components/**
+    #   - update-policies/**
+  workflow_dispatch:
 
 jobs:
   flux-push-component:
@@ -36,10 +40,10 @@ jobs:
               echo "Ref name is not in the format component/version"
               exit 1
           fi
-          
+
           COMPONENT=$(echo "$REF_NAME" | cut -d'/' -f 1)
           VERSION=$(echo "$REF_NAME" | cut -d'/' -f 2)
-          
+
           echo "component=${COMPONENT}" >> $GITHUB_OUTPUT
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
       - name: Push artifact

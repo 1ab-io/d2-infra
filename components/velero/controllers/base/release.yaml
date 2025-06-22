@@ -1,0 +1,144 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: velero
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: velero
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: vmware-tanzu
+  releaseName: velero
+  # https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml
+  values:
+    initContainers:
+      # https://github.com/vmware-tanzu/velero-plugin-for-aws
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.11.1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+      # https://github.com/openebs/velero-plugin
+      - name: openebs-velero-plugin
+        image: openebs/velero-plugin:3.6.0
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+    configuration:
+      # Parameters for the BackupStorageLocation(s). Configure multiple by adding other element(s) to the backupStorageLocation slice.
+      # See https://velero.io/docs/v1.6/api-types/backupstoragelocation/
+      backupStorageLocation:
+        # name is the name of the backup storage location where backups should be stored. If a name is not provided,
+        # a backup storage location will be created with the name "default". Optional.
+        - name: b2
+          # provider is the name for the backup storage location provider.
+          provider: aws
+          # bucket is the name of the bucket to store backups in. Required.
+          bucket: ${B2_BUCKET_NAME}
+          # caCert defines a base64 encoded CA bundle to use when verifying TLS connections to the provider. Optional.
+          caCert:
+          # prefix is the directory under which all Velero data should be stored within the bucket. Optional.
+          prefix:
+          # default indicates this location is the default backup storage location. Optional.
+          default: true
+          backupSyncPeriod: 24h # 0s
+          # validationFrequency defines how frequently Velero should validate the object storage. Optional.
+          validationFrequency: 24h # Default: 1m
+          # accessMode determines if velero can write to this backup storage location. Optional.
+          # default to ReadWrite, ReadOnly is used during migrations and restores.
+          accessMode: ReadWrite
+          credential:
+            # name of the secret used by this backupStorageLocation.
+            name:
+            # name of key that contains the secret data to be used.
+            key:
+          # Additional provider-specific configuration. See link above
+          # for details of required/optional fields for your provider.
+          config:
+            region: ${B2_REGION}
+            # s3ForcePathStyle:
+            s3Url: https://${B2_ENDPOINT}
+            # kmsKeyId:
+            # resourceGroup:
+            # # The ID of the subscription containing the storage account, if different from the cluster’s subscription. (Azure only)
+            # subscriptionId:
+            # storageAccount:
+            # publicUrl:
+            # # Name of the GCP service account to use for this backup storage location. Specify the
+            # # service account here if you want to use workload identity instead of providing the key file.(GCP only)
+            # serviceAccount:
+            # # Option to skip certificate validation or not if insecureSkipTLSVerify is set to be true, the client side should set the
+            # # flag. For Velero client Command like velero backup describe, velero backup logs needs to add the flag --insecure-skip-tls-verify
+            # insecureSkipTLSVerify:
+            checksumAlgorithm: ""
+
+          # annotations allows adding arbitrary annotations to this BackupStorageLocation resource. Optional.
+          annotations: {}
+
+      # Parameters for the VolumeSnapshotLocation(s). Configure multiple by adding other element(s) to the volumeSnapshotLocation slice.
+      # See https://velero.io/docs/v1.6/api-types/volumesnapshotlocation/
+      volumeSnapshotLocation:
+        # name is the name of the volume snapshot location where snapshots are being taken. If a name is not provided,
+        # a volume snapshot location will be created with the name "default". Optional.
+        - name: b2
+          # provider is the name for the volume snapshot provider.
+          provider: aws
+          credential:
+            # name of the secret used by this volumeSnapshotLocation.
+            name:
+            # name of key that contains the secret data to be used.
+            key:
+          # Additional provider-specific configuration. See link above
+          # for details of required/optional fields for your provider.
+          config:
+            region: ${B2_REGION}
+            # apiTimeout:
+            # resourceGroup:
+            # # The ID of the subscription where volume snapshots should be stored, if different from the cluster’s subscription. If specified, also requires `configuration.volumeSnapshotLocation.config.resourceGroup`to be set. (Azure only)
+            # subscriptionId:
+            # incremental:
+            # snapshotLocation:
+            # project:
+            #
+          # annotations allows adding arbitrary annotations to this VolumeSnapshotLocation resource. Optional.
+          annotations: {}
+    credentials:
+      # Whether a secret should be used. Set to false if, for examples:
+      # - using kube2iam or kiam to provide AWS IAM credentials instead of providing the key file. (AWS only)
+      # - using workload identity instead of providing the key file. (Azure/GCP only)
+      useSecret: true
+      # Name of the secret to create if `useSecret` is true and `existingSecret` is empty
+      name:
+      # Name of a pre-existing secret (if any) in the Velero namespace
+      # that should be used to get IAM account credentials. Optional.
+      existingSecret:
+      # Data to be stored in the Velero secret, if `useSecret` is true and `existingSecret` is empty.
+      # As of the current Velero release, Velero only uses one secret key/value at a time.
+      # The key must be named `cloud`, and the value corresponds to the entire content of your IAM credentials file.
+      # Note that the format will be different for different providers, please check their documentation.
+      # Here is a list of documentation for plugins maintained by the Velero team:
+      # [AWS] https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/main/README.md
+      # [GCP] https://github.com/vmware-tanzu/velero-plugin-for-gcp/blob/main/README.md
+      # [Azure] https://github.com/vmware-tanzu/velero-plugin-for-microsoft-azure/blob/main/README.md
+      secretContents:
+        cloud: |
+          [default]
+          aws_access_key_id=${B2_APPLICATION_KEY_ID}
+          aws_secret_access_key=${B2_APPLICATION_KEY}
+      # additional key/value pairs to be used as environment variables such as "DIGITALOCEAN_TOKEN: <your-key>". Values will be stored in the secret.
+      extraEnvVars: {}
+      # Name of a pre-existing secret (if any) in the Velero namespace
+      # that will be used to load environment variables into velero and node-agent.
+      # Secret should be in format - https://kubernetes.io/docs/concepts/configuration/secret/#use-case-as-container-environment-variables
+      extraSecretRef: ""
+
+    # Whether to create backupstoragelocation crd, if false => do not create a default backup location
+    backupsEnabled: true
+    # Whether to create volumesnapshotlocation crd, if false => disable snapshot feature
+    snapshotsEnabled: true

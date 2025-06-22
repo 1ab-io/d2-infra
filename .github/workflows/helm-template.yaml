@@ -1,0 +1,65 @@
+name: helm-template
+
+on:
+  # TODO: gh pr create if ./manifests changed
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - .github/workflows/helm-template.yaml
+  #     - components/cert-manager/controllers/**
+  #     - components/cilium/controllers/**
+  #     - components/external-secrets/controllers/**
+  #     - components/flux-operator/controllers/**
+  #     - components/talos-ccm/controllers/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     component:
+    #       - cert-manager
+    #       - cilium
+    #       - talos-ccm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Set up yq
+        uses: mikefarah/yq@v4
+
+      - name: Render manifests
+        run: ./scripts/helm-template.sh
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # name: ${{ matrix.component }}
+          path: public/
+
+      - name: Deploy pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        # with:
+        #   artifact_name: ${{ matrix.component }}
