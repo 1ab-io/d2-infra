@@ -1,0 +1,13 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: siderolabs
+spec:
+  interval: 1h
+  url: oci://ghcr.io/siderolabs/charts
+  layerSelector:
+    mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
+    operation: copy
+  ref:
+    tag: v0.4.6 # {"$imagepolicy": "infra:talos-ccm:tag"}

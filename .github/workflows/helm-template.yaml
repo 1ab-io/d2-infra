@@ -53,7 +53,7 @@ jobs:
           echo '<h1>Manifests</h1>' >public/index.html
           echo '<ul>' >>public/index.html
           # chart="${{ matrix.component }}"
-          for chart in cert-manager cilium; do
+          for chart in cert-manager cilium talos-ccm; do
             repo_file="components/$chart/controllers/base/repository.yaml"
             file="components/$chart/controllers/base/release.yaml"
             url=$(yq e '.spec.url' "$repo_file")
@@ -68,7 +68,7 @@ jobs:
               helm pull "$chart/$chart" --version "$tag" --untar --untardir charts
             fi
             helm template "$name" "charts/$chart" --values "$chart.values.yaml" >"public/$chart.yaml"
-            echo '<a href="'$chart'.yaml">'$chart'</a>' >>public/index.html
+            echo '<li><a href="'$chart'.yaml">'$chart'</a></li>' >>public/index.html
           echo '</ul>' >>public/index.html
           done
 
