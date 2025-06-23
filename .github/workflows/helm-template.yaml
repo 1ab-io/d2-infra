@@ -6,10 +6,9 @@ on:
       - main
     paths:
       - .github/workflows/helm-template.yaml
-      - components/cilium/controllers/base/repository.yaml
-      - components/cilium/controllers/base/release.yaml
-      - components/cert-manager/controllers/base/repository.yaml
-      - components/cert-manager/controllers/base/release.yaml
+      - components/cilium/controllers/
+      - components/cert-manager/controllers/
+      - components/talos-ccm/controllers/
   workflow_dispatch:
 
 permissions:

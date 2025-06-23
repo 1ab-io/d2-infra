@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: siderolabs
+  name: talos-ccm
 spec:
   interval: 1h
   releaseName: talos-cloud-controller-manager
   chartRef:
     kind: OCIRepository
-    name: talos-ccm
+    name: siderolabs
   values:
     enabledControllers:
       - node-csr-approval
