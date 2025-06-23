@@ -15,6 +15,7 @@ jobs:
           - cert-manager
           - cilium
           - monitoring
+          - talos-ccm
     runs-on: ubuntu-latest
     permissions:
       contents: read

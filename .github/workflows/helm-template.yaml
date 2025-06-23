@@ -33,6 +33,7 @@ jobs:
     #     component:
     #       - cert-manager
     #       - cilium
+    #       - talos-ccm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
