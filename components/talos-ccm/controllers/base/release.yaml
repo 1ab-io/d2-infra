@@ -19,6 +19,7 @@ spec:
       - effect: NoSchedule
         key: node.cloudprovider.kubernetes.io/uninitialized
         operator: Exists
+      - key: node.cilium.io/agent-not-ready
       - key: node.kubernetes.io/network-unavailable
       - effect: NoSchedule
         key: node.kubernetes.io/not-ready
