@@ -8,6 +8,7 @@ on:
       - .github/workflows/helm-template.yaml
       - components/cilium/controllers/
       - components/cert-manager/controllers/
+      - components/external-secrets/controllers/
       - components/talos-ccm/controllers/
   workflow_dispatch:
 
