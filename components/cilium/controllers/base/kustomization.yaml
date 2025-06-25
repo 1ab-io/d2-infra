@@ -2,13 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: kube-system
 resources:
+  - namespace.yaml
   - repository.yaml
   - release.yaml
-patches:
-  - patch: |
-      - op: replace
-        path: /metadata/labels/pod-security.kubernetes.io~1enforce
-        value: privileged
-    target:
-      kind: Namespace
-      name: kube-system
+# unable to set memory resource limits" error="failed to set memlock rlimit: operation not permitted
+# patches:
+#   - patch: |
+#       - op: replace
+#         path: /metadata/labels/pod-security.kubernetes.io~1enforce
+#         value: privileged
+#     target:
+#       kind: Namespace
+#       name: kube-system
