@@ -35,3 +35,10 @@ spec:
       autoMount:
         enabled: false
       hostRoot: /sys/fs/cgroup
+
+    k8sServiceHost: localhost
+    k8sServicePort: 7445
+
+    operator:
+      # Single node port
+      replicas: 1

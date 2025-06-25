@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: OCIRepository
 metadata:
-  name: cert-manager-chart
+  name: cert-manager
 spec:
   interval: 1h
   url: oci://quay.io/jetstack/charts
@@ -10,4 +10,4 @@ spec:
     mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
     operation: copy
   ref:
-    tag: v1.18.1 # {"$imagepolicy": "infra:cert-manager:tag"}
+    tag: v1.17.2 # {"$imagepolicy": "infra:cert-manager:tag"}

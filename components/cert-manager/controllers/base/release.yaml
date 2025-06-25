@@ -8,7 +8,7 @@ spec:
   releaseName: cert-manager
   chartRef:
     kind: OCIRepository
-    name: cert-manager-chart
+    name: cert-manager
   # https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
   values:
     # yaml-language-server: $schema=https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/charts/cert-manager/values.schema.json
@@ -26,3 +26,4 @@ spec:
         # operator: Equal
         # value: master
         # effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
