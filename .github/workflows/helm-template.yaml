@@ -48,30 +48,7 @@ jobs:
         uses: mikefarah/yq@v4
 
       - name: Render manifests
-        run: |
-          set -eux
-          mkdir -p charts public
-          echo '<h1>Manifests</h1>' >public/index.html
-          echo '<ul>' >>public/index.html
-          # chart="${{ matrix.component }}"
-          for chart in cert-manager cilium talos-ccm; do
-            repo_file="components/$chart/controllers/base/repository.yaml"
-            file="components/$chart/controllers/base/release.yaml"
-            url=$(yq e '.spec.url' "$repo_file")
-            tag=$(yq e '.spec.ref.tag' "$repo_file")
-            name=$(yq e '.spec.releaseName' "$file")
-            yq e '.spec.values' $file >$chart.values.yaml
-            if [[ "$url" == oci://* ]]; then
-              helm pull "$url" --version "$tag" --untar --untardir charts
-            else
-              helm repo add "$chart" "$url"
-              helm repo update
-              helm pull "$chart/$chart" --version "$tag" --untar --untardir charts
-            fi
-            helm template "$name" "charts/$chart" --values "$chart.values.yaml" >"public/$chart.yaml"
-            echo '<li><a href="'$chart'.yaml">'$chart'</a></li>' >>public/index.html
-          echo '</ul>' >>public/index.html
-          done
+        run: ./scripts/helm-template.sh
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

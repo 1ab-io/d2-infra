@@ -9,5 +9,5 @@ spec:
   layerSelector:
     mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
     operation: copy
-  ref:
-    tag: v0.4.6 # {"$imagepolicy": "infra:talos-ccm:tag"}
+  # ref:
+  #   tag: v0.4.6 # {"$imagepolicy": "infra:talos-ccm:tag"}
