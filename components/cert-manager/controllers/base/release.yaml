@@ -9,6 +9,7 @@ spec:
   chartRef:
     kind: OCIRepository
     name: cert-manager-chart
+  # https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
   values:
     # yaml-language-server: $schema=https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/charts/cert-manager/values.schema.json
     crds:
