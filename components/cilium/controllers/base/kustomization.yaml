@@ -5,7 +5,8 @@ resources:
   - namespace.yaml
   - repository.yaml
   - release.yaml
-# unable to set memory resource limits" error="failed to set memlock rlimit: operation not permitted
+# FIXME: failed to set memlock rlimit: operation not permitted
+# unable to set memory resource limits
 # patches:
 #   - patch: |
 #       - op: replace
