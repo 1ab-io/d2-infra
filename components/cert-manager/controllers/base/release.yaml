@@ -10,4 +10,18 @@ spec:
     kind: OCIRepository
     name: cert-manager-chart
   values:
-    installCRDs: true
+    # yaml-language-server: $schema=https://raw.githubusercontent.com/cert-manager/cert-manager/refs/heads/master/deploy/charts/cert-manager/values.schema.json
+    crds:
+      enabled: true
+      keep: false
+    # https://cert-manager.io/docs/usage/gateway/
+    # config:
+    #   apiVersion: controller.config.cert-manager.io/v1alpha1
+    #   kind: ControllerConfiguration
+    #   enableGatewayAPI: true
+    # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/#taint-based-evictions
+    tolerations:
+      - key: node.kubernetes.io/network-unavailable
+        # operator: Equal
+        # value: master
+        # effect: NoSchedule

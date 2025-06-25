@@ -25,6 +25,5 @@ go.work.sum
 .env
 
 # Helm template
-*.values.yaml
 charts/
 public/
