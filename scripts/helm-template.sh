@@ -2,6 +2,8 @@
 
 set -eux
 
+# environment=staging
+
 rm -fr charts public
 
 mkdir -p charts public
@@ -9,7 +11,10 @@ echo '<h1>Manifests</h1>' >public/index.html
 echo '<ul>' >>public/index.html
 
 # chart="${{ matrix.component }}"
-for chart in cert-manager cilium external-secrets talos-ccm; do
+for chart in cert-manager cilium external-secrets flux-operator talos-ccm; do
+  # TODO: https://github.com/fluxcd/flux2/issues/2808
+  # controller_ks="components/$chart/controllers/$environment/kustomization.yaml"
+  # config_ks="components/$chart/configs/$environment/kustomization.yaml"
   repo_file="components/$chart/controllers/base/repository.yaml"
   file="components/$chart/controllers/base/release.yaml"
   ks="components/$chart/controllers/base/kustomization.yaml"
