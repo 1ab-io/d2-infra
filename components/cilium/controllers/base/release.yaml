@@ -39,6 +39,9 @@ spec:
     k8sServiceHost: localhost
     k8sServicePort: 7445
 
+    nodePort:
+      enabled: true
+
     operator:
       # Single node port
       replicas: 1
