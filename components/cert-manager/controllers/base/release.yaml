@@ -22,8 +22,6 @@ spec:
     #   enableGatewayAPI: true
     # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/#taint-based-evictions
     tolerations:
-      - key: node.kubernetes.io/network-unavailable
-        # operator: Equal
-        # value: master
-        # effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
+      - effect: NoSchedule
+        key: node.kubernetes.io/not-ready
+        operator: Exists

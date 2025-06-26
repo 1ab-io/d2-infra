@@ -39,7 +39,6 @@ spec:
     k8sServiceHost: localhost
     k8sServicePort: 7445
 
-    # FIXME: failed to set memlock rlimit: operation not permitted
     nodePort:
       enabled: true
 
