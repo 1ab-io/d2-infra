@@ -1,16 +1,17 @@
 name: helm-template
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/helm-template.yaml
-      - components/cert-manager/controllers/**
-      - components/cilium/controllers/**
-      - components/external-secrets/controllers/**
-      - components/flux-operator/controllers/**
-      - components/talos-ccm/controllers/**
+  # TODO: gh pr create if ./manifests changed
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - .github/workflows/helm-template.yaml
+  #     - components/cert-manager/controllers/**
+  #     - components/cilium/controllers/**
+  #     - components/external-secrets/controllers/**
+  #     - components/flux-operator/controllers/**
+  #     - components/talos-ccm/controllers/**
   workflow_dispatch:
 
 permissions:

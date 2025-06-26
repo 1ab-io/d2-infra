@@ -4,11 +4,9 @@ set -eux
 
 # environment=staging
 
-rm -fr charts public
+rm -fr manifests.out manifests
 
-mkdir -p charts public
-echo '<h1>Manifests</h1>' >public/index.html
-echo '<ul>' >>public/index.html
+mkdir -p manifests.out manifests
 
 # chart="${{ matrix.component }}"
 for chart in cert-manager cilium external-secrets flux-operator talos-ccm; do
@@ -23,27 +21,24 @@ for chart in cert-manager cilium external-secrets flux-operator talos-ccm; do
   version=$(yq e '.spec.ref.tag' "$repo_file")
   release_name=$(yq e '.spec.releaseName' "$file")
   namsespace=$(yq e '.namespace' "$ks")
-  yq e '.spec.values' $file >"charts/$chart.values.yaml"
+  yq e '.spec.values' $file >"manifests.out/$chart.values.yaml"
   if [ "$version" = null ]; then
     version="*"
   fi
   if [[ "$url" == oci://* ]]; then
-    helm pull "$url/$release_name" --version "$version" --untar --untardir charts
+    helm pull "$url/$release_name" --version "$version" --untar --untardir manifests.out
   else
     helm repo add --force-update "$chart" "$url"
     helm repo update
-    helm pull "$chart/$release_name" --version "$version" --untar --untardir charts
+    helm pull "$chart/$release_name" --version "$version" --untar --untardir manifests.out
   fi
   args=()
   if [ "$namsespace" != null ]; then
     args+=("--namespace=$namsespace")
   fi
-  helm template "${args[@]}" "$release_name" "charts/$release_name" --values "charts/$chart.values.yaml" >"charts/$chart.yaml"
-  echo "# $chart $version" >"public/$chart.yaml"
+  helm template "${args[@]}" "$release_name" "manifests.out/$release_name" --values "manifests.out/$chart.values.yaml" >"manifests.out/$chart.yaml"
   if [ -f "$ns" ]; then
-    cat "$ns" >>"public/$chart.yaml"
+    cat "$ns" >>"manifests/$chart.yaml"
   fi
-  cat "charts/$chart.yaml" >>"public/$chart.yaml"
-  echo '<li><a href="'$chart'.yaml">'$chart'</a></li>' >>public/index.html
+  cat "manifests.out/$chart.yaml" >>"manifests/$chart.yaml"
 done
-echo '</ul>' >>public/index.html
