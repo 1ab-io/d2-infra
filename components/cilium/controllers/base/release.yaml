@@ -36,6 +36,47 @@ spec:
         enabled: false
       hostRoot: /sys/fs/cgroup
 
+    externalIPs:
+      enabled: true
+
+    hostFirewall:
+      enabled: true
+    policyAuditMode: true # false
+
+    hostPort:
+      enabled: true
+
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+        # prometheus:
+        #   enabled: true
+        #   serviceMonitor:
+        #     enabled: true
+        # FIXME: hubble-relay out of memory
+        resources: {}
+        tls:
+          server:
+            enabled: true
+      peerService:
+        targetPort: 4244
+        clusterDomain: cluster.local # ${CLUSTER_DOMAIN}
+      tls:
+        enabled: true
+        auto:
+          enabled: true
+          method: certmanager
+          certManagerIssuerRef:
+            group: cert-manager.io
+            kind: Issuer
+            name: ca-issuer
+      ui:
+        enabled: true
+
+    k8sNetworkPolicy:
+      enabled: true
+
     k8sServiceHost: localhost
     k8sServicePort: 7445
 
@@ -45,3 +86,11 @@ spec:
     operator:
       # Single node port
       replicas: 1
+
+    # prometheus:
+    #   metricsService: true
+    #   enabled: true
+    #   # port: 9962
+    #   serviceMonitor:
+    #     enabled: true
+    #     trustCRDsExist: true
