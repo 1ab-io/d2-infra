@@ -9,6 +9,7 @@ on:
       - components/cert-manager/controllers/**
       - components/cilium/controllers/**
       - components/external-secrets/controllers/**
+      - components/flux-operator/controllers/**
       - components/talos-ccm/controllers/**
   workflow_dispatch:
 
