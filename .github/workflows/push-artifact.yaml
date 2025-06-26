@@ -14,6 +14,8 @@ jobs:
         component:
           - cert-manager
           - cilium
+          - external-secrets
+          - flux-operator
           - monitoring
           - talos-ccm
     runs-on: ubuntu-latest
