@@ -5,6 +5,14 @@ metadata:
   name: external-secrets
 spec:
   interval: 1h
+  timeout: 5m
+  chart:
+    spec:
+      chart: external-secrets
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: external-secrets
   releaseName: external-secrets
   chartRef:
     kind: HelmRepository

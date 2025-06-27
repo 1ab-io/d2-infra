@@ -5,10 +5,15 @@ metadata:
   name: cilium
 spec:
   interval: 1h
+  timeout: 5m
+  chart:
+    spec:
+      chart: cilium
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
   releaseName: cilium
-  chartRef:
-    kind: HelmRepository
-    name: cilium
   values:
     ipam:
       mode: kubernetes
