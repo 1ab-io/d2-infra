@@ -7,7 +7,7 @@ spec:
   interval: 1h
   releaseName: cilium
   chartRef:
-    kind: OCIRepository
+    kind: HelmRepository
     name: cilium
   values:
     ipam:
