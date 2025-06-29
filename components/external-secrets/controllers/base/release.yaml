@@ -14,9 +14,6 @@ spec:
         kind: HelmRepository
         name: external-secrets
   releaseName: external-secrets
-  chartRef:
-    kind: HelmRepository
-    name: external-secrets
   values:
     bitwarden-sdk-server:
       enabled: true

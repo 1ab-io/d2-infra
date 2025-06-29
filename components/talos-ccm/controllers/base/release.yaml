@@ -5,10 +5,10 @@ metadata:
   name: talos-ccm
 spec:
   interval: 1h
-  releaseName: talos-cloud-controller-manager
   chartRef:
     kind: OCIRepository
     name: siderolabs
+  releaseName: talos-cloud-controller-manager
   values:
     enabledControllers:
       - node-csr-approval

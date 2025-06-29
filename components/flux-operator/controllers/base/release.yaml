@@ -5,10 +5,10 @@ metadata:
   name: flux-operator
 spec:
   interval: 1h
-  releaseName: flux-operator
   chartRef:
     kind: OCIRepository
     name: controlplaneio-fluxcd
+  releaseName: flux-operator
   values:
     multitenancy:
       enabled: true
