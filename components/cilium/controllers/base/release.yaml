@@ -52,9 +52,9 @@ spec:
       enabled: true
 
     hubble:
-      enabled: true
+      enabled: false # true
       relay:
-        enabled: true
+        enabled: false # true
         # prometheus:
         #   enabled: true
         #   serviceMonitor:
@@ -77,7 +77,7 @@ spec:
             kind: Issuer
             name: ca-issuer
       ui:
-        enabled: true
+        enabled: false # true
 
     k8sNetworkPolicy:
       enabled: true
