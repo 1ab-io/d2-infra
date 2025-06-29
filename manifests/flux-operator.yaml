@@ -1,4 +1,9 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flux-system
+---
 # Source: flux-operator/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
