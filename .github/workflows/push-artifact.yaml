@@ -18,6 +18,7 @@ jobs:
           - flux-operator
           - gitlab-agent
           - gitlab-runner
+          - ingress-nginx
           - monitoring
           - talos-ccm
           - velero
