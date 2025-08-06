@@ -16,6 +16,8 @@ jobs:
           - cilium
           - external-secrets
           - flux-operator
+          - gitlab-agent
+          - gitlab-runner
           - monitoring
           - talos-ccm
           - velero
