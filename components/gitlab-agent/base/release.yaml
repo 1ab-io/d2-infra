@@ -1,0 +1,24 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gitlab-agent
+spec:
+  interval: 1h
+  # timeout: 5m
+  chart:
+    spec:
+      chart: gitlab-agent
+      version: "2.11.0" # {"$imagepolicy": "gitlab-agent:gitlab-agent:tag"}
+      sourceRef:
+        kind: HelmRepository
+        name: gitlab
+  releaseName: gitlab-agent
+  # https://gitlab.com/gitlab-org/charts/gitlab-agent/-/blob/main/README.md#values
+  values:
+    image:
+      tag: ""
+    config:
+      secretName: gitlab-agent # token
+      kasAddress: wss://kas.gitlab.com
+    replicas: 1
