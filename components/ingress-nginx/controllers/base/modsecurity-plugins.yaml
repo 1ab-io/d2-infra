@@ -1,0 +1,159 @@
+---
+# https://kubernetes.github.io/ingress-nginx/user-guide/third-party-addons/modsecurity/
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: modsecurity-plugins
+  # annotations:
+  #   reloader.stakater.com/match: "true"
+data:
+  empty-after.conf: |
+    # no data
+  empty-before.conf: |
+    # no data
+  empty-config.conf: |
+    # no data
+  # REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+  # https://github.com/coreruleset/coreruleset/issues/3556
+  # https://coreruleset.org/docs/2-how-crs-works/2-3-false-positives-and-tuning/#example-7-ctlruleremovetargetbyid
+  # WARN: rule id must be unique
+  chat-rule-exclusions-before.conf: |
+    # DELETE /api/v1/folders/*
+    # POST /api/chat/completed
+    # POST /api/v1/auths/signup
+    # POST /api/v1/chats/*
+    # /chat/completed|v1/(auths/signup|chats|folders/.*)/
+    SecRule SERVER_NAME "chat\..*$" \
+        "id:1000, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/api/.*$" \
+          "ctl:ruleRemoveById=949110"
+  gitops-rule-exclusions-before.conf: |
+    # POST /oauth2/sign_in
+    # POST /v1/...
+    SecRule SERVER_NAME "gitops\..*$" \
+        "id:1010, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/(oauth2/sign_in|v1/.*)$" \
+          "ctl:ruleRemoveById=920420,ctl:ruleRemoveById=949110"
+    # POST /v1/objects
+    SecRule SERVER_NAME "gitops\..*$" \
+        "id:1011, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/v1/objects$" \
+          "ctl:ruleRemoveById=920420"
+    # ?redirect=%2F
+  grafana-rule-exclusions-before.conf: |
+    # SecRule REQUEST_URI "@beginsWith /api/ds/query" \
+    #     "id:1000,\
+    #     phase:2,\
+    #     pass,\
+    #     nolog,\
+    #     ctl:ruleRemoveTargetById=949110;ARGS:text_input"
+    # POST /api/query-history
+    # GET /api/ds/query?
+    # /explore?
+    # admin|dashboards|ds/query|query-history|folders|serviceaccounts|user
+    # GET /a/grafana-lokiexplore-app/explore/service/ingress-nginx/logs?
+    SecRule SERVER_NAME "grafana\..*$" \
+        "id:1020, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/(a/.*|api/.*|explore)\??.*$" \
+          "ctl:ruleRemoveById=949110"
+    # ctl:ruleRemoveById=920440, \
+  harbor-rule-exclusions-before.conf: |
+    # POST /api/v2.0/registries/ping
+    # POST /api/v2.0/users/.*/password
+    # PUT /api/v2.0/users/.*/sysadmin
+    SecRule SERVER_NAME "harbor\..*$" \
+        "id:1030, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/api/.*$" \
+          "ctl:ruleRemoveById=949110"
+  headlamp-rule-exclusions-before.conf: |
+    # GET /static-plugins/prometheus/package.json
+    SecRule SERVER_NAME "headlamp\..*$" \
+        "id:1040, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/.*$" \
+          "ctl:ruleRemoveById=949110"
+  headscale-rule-exclusions-before.conf: |
+    # DELETE /api/v1/node/1
+    SecRule SERVER_NAME "headscale\..*$" \
+        "id:1050, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/api/.*$" \
+          "ctl:ruleRemoveById=949110"
+  helicone-rule-exclusions-before.conf: |
+    # DELETE /jawn/v1/api-keys/1
+    SecRule SERVER_NAME "helicone\..*$" \
+        "id:1060, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/.*$" \
+          "ctl:ruleRemoveById=949110"
+  hubble-rule-exclusions-before.conf: |
+    SecRule SERVER_NAME "hubble\..*$" \
+        "id:1070, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/(api/(control-stream|service-map-stream)|oauth2/auth)$" \
+          "ctl:ruleRemoveById=949110"
+  litellm-rule-exclusions-before.conf: |
+    # DELETE /credentials/*
+    # GET /global/activity/exceptions?
+    # POST /model/new
+    SecRule SERVER_NAME "litellm\..*$" \
+        "id:1080, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/.*$" \
+          "ctl:ruleRemoveById=949110"
+  s3-rule-exclusions-before.conf: |
+    # DELETE /api/v1/buckets/<bucket>
+    # 911100: Method not allowed
+    SecRule SERVER_NAME "minio\..*$" \
+        "id:1090, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/.*\??.*$" \
+          "ctl:ruleRemoveById=911100,ctl:ruleRemoveById=949110"
+    # PUT /<bucket>/
+    # 911100 and 920340: Method not allowed
+    SecRule SERVER_NAME "s3\..*$" \
+        "id:1091, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/.*\??.*$" \
+          "ctl:ruleRemoveById=911100,ctl:ruleRemoveById=920340,ctl:ruleRemoveById=949110"
+  # nextcloud-rule-exclusions-before.conf:
+  #   # this is just a snippet
+  #   # find the full file at https://github.com/coreruleset/nextcloud-rule-exclusions-plugin
+  #   #
+  #   # [ File Manager ]
+  #   # The web interface uploads files, and interacts with the user.
+  #   SecRule REQUEST_FILENAME "@contains /remote.php/webdav" \
+  #       "id:9508102,\
+  #       phase:1,\
+  #       pass,\
+  #       t:none,\
+  #       nolog,\
+  #       ver:'nextcloud-rule-exclusions-plugin/1.2.0',\
+  #       ctl:ruleRemoveById=920420,\
+  #       ctl:ruleRemoveById=920440,\
+  #       ctl:ruleRemoveById=941000-942999,\
+  #       ctl:ruleRemoveById=951000-951999,\
+  #       ctl:ruleRemoveById=953100-953130,\
+  #       ctl:ruleRemoveByTag=attack-injection-php"
+  supabase-rule-exclusions-before.conf: |
+    # POST /api/pg-meta/default/query?*
+    SecRule SERVER_NAME "(|supabase-)studio\..*$" \
+        "id:1100, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/api/.*$" \
+          "ctl:ruleRemoveById=949110"
+  wazuh-rule-exclusions-before.conf: |
+    # POST /internal/search/opensearch-with-long-numerals
+    # PUT /api/saved_objects/index-pattern/wazuh-alerts-*
+    # PUT /utils/configuration
+    SecRule SERVER_NAME "wazuh\..*$" \
+        "id:1110, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/(api/.*|internal/search/.*|utils/configuration)$" \
+          "ctl:ruleRemoveById=949110"
+  windmill-rule-exclusions-before.conf: |
+    # POST /api/settings/global/oauths
+    SecRule SERVER_NAME "windmill\..*$" \
+        "id:1120, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/api/.*$" \
+          "ctl:ruleRemoveById=949110"
+  workflow-rule-exclusions-before.conf: |
+    # DELETE,PATCH /rest/credentials/*
+    # PATCH /rest/me/settings
+    # POST /rest/workflows[/.../run?partialExecutionVersion=2]
+    # /rest/(credentials|me/settings|workflows|workflows/.*)
+    SecRule SERVER_NAME "workflow\..*$" \
+        "id:1130, phase:1, nolog, chain"
+        SecRule REQUEST_URI "^/rest/.*$" \
+          "ctl:ruleRemoveById=949110"
