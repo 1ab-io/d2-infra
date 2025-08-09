@@ -21,10 +21,10 @@ spec:
       service:
         annotations:
           lbipam.cilium.io/sharing-cross-namespace: "*"
-          lbipam.cilium.io/sharing-key: control-plane-1
+          lbipam.cilium.io/sharing-key: ${HOSTNAME_CP1}
         labels:
           # Used by CiliumLoadBalancerIPPool
-          node: control-plane-1
+          node: ${HOSTNAME_CP1}
         type: LoadBalancer # NodePort
         # Required to preserve client IP for whitelist-source-range
         # https://github.com/kubernetes/ingress-nginx/issues/2096
@@ -182,7 +182,7 @@ spec:
                   - key: kubernetes.io/hostname # or metadata.name
                     operator: In
                     values:
-                      - control-plane-1
+                      - ${HOSTNAME_CP1}
 
     admissionWebhooks:
       enabled: true
