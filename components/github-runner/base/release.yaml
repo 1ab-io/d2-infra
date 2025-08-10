@@ -13,3 +13,4 @@ spec:
   # https://github.com/actions/actions-runner-controller/blob/master/charts/gha-runner-scale-set-controller/values.yaml
   values:
     githubConfigSecret: github-runner # pre-defined-secret
+    githubConfigUrl: https://github.com/1ab-io
