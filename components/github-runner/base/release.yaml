@@ -14,3 +14,4 @@ spec:
   values:
     githubConfigSecret: github-runner # pre-defined-secret
     githubConfigUrl: https://github.com/1ab-io
+    runnerScaleSetName: self-hosted
