@@ -46,7 +46,7 @@ spec:
 
     hostFirewall:
       enabled: true
-    policyAuditMode: true # false
+    policyAuditMode: false
 
     hostPort:
       enabled: true
