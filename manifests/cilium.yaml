@@ -228,7 +228,7 @@ data:
   enable-well-known-identities: "false"
   enable-node-selector-labels: "false"
   synchronize-k8s-nodes: "true"
-  policy-audit-mode: "true"
+  policy-audit-mode: "false"
   operator-api-serve-addr: "127.0.0.1:9234"
 
   enable-hubble: "true"
