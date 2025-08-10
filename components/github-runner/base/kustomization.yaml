@@ -1,0 +1,11 @@
+---
+# https://docs.github.com/en/actions/tutorials/use-actions-runner-controller/quickstart
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: github-runner
+resources:
+  - repository.yaml
+  - release.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: github

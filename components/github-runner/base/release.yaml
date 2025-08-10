@@ -1,0 +1,15 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runner
+spec:
+  interval: 1h
+  # timeout: 5m
+  chartRef:
+    kind: OCIRepository
+    name: gha-runner-scale-set-controller
+  releaseName: github-runner
+  # https://github.com/actions/actions-runner-controller/blob/master/charts/gha-runner-scale-set-controller/values.yaml
+  values:
+    githubConfigSecret: github-runner # pre-defined-secret
