@@ -9,5 +9,5 @@ spec:
   layerSelector:
     mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
     operation: copy
-  # ref:
-  #   tag: "" # {"$imagepolicy": "github-runner:github-runner:tag"}
+  ref:
+    tag: 0.12.1 # {"$imagepolicy": "github-runner:github-runner:tag"}
