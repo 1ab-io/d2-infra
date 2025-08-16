@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: tailscale-operator
-      version: "0.73.3" # {"$imagepolicy": "tailscale-operator:tailscale-operator:tag"}
+      version: "1.86.2" # {"$imagepolicy": "tailscale-operator:tailscale-operator:tag"}
       sourceRef:
         kind: HelmRepository
         name: tailscale
