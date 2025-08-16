@@ -21,6 +21,7 @@ jobs:
           - gitlab-runner
           - ingress-nginx
           - monitoring
+          - tailscale-operator
           - talos-ccm
           - velero
     runs-on: ubuntu-latest
