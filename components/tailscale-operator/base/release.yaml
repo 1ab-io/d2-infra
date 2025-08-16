@@ -1,0 +1,80 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tailscale-operator
+spec:
+  interval: 1h
+  # timeout: 5m
+  chart:
+    spec:
+      chart: tailscale-operator
+      version: "0.73.3" # {"$imagepolicy": "tailscale-operator:tailscale-operator:tag"}
+      sourceRef:
+        kind: HelmRepository
+        name: tailscale
+  releaseName: tailscale-operator
+  # https://github.com/tailscale/tailscale/blob/main/cmd/k8s-operator/deploy/chart/values.yaml
+  values:
+    oauth:
+      clientId: # "${TAILSCALE_OAUTH_CLIENT_ID}"
+      clientSecret: # "${TAILSCALE_OAUTH_CLIENT_SECRET}"
+    # oauthSecretVolume: {}
+    #   csi:
+    #     driver: secrets-store.csi.k8s.io
+    #     readOnly: true
+    #     volumeAttributes:
+    #       secretProviderClass: tailscale-oauth
+    installCRDs: true
+
+    operatorConfig:
+      defaultTags:
+        # - "tag:infra"
+        - "tag:k8s-operator"
+        # - "tag:${ENVIRONMENT}"
+      # image:
+      #   repository: docker.io/1abio/tailscale-operator # tailscale/k8s-operator
+      #   tag: latest
+      logging: info # info, debug, dev
+      hostname: ${CLUSTER_NAME} # tailscale-operator
+      nodeSelector:
+        kubernetes.io/os: linux
+
+      resources: {}
+
+      podAnnotations: {}
+      podLabels: {}
+
+      serviceAccountAnnotations: {}
+      # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/tailscale-operator-role
+
+      tolerations: []
+
+      affinity: {}
+
+      podSecurityContext: {}
+
+      securityContext: {}
+
+      extraEnv: []
+      # - name: EXTRA_VAR1
+      #   value: "value1"
+      # - name: EXTRA_VAR2
+      #   value: "value2"
+
+    ingressClass:
+      enabled: true
+
+    proxyConfig:
+      # Repository defaults to DockerHub, but images are also synced to ghcr.io/tailscale/tailscale.
+      # image:
+      #   repository: docker.io/1abio/tailscale # tailscale/tailscale
+      #   tag: latest
+      defaultTags: "tag:k8s" # "tag:k8s\,tag:prod"
+      # defaultTags: "tag:k8s,tag:${ENVIRONMENT}"
+      firewallMode: auto
+      defaultProxyClass: ""
+
+    # https://tailscale.com/kb/1312/serve#identity-headers
+    apiServerProxyConfig:
+      mode: "true" # "true", "false", "noauth"
