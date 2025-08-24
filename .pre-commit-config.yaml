@@ -1,0 +1,25 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  # - repo: https://github.com/pre-commit/pre-commit-hooks
+  #   rev: v5.0.0
+  #   hooks:
+  #     - id: trailing-whitespace
+  #     - id: end-of-file-fixer
+  #     - id: check-yaml
+  #     - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: helm-release-validation
+        name: Validate Helm releases
+        entry: ./scripts/validate-helm.sh
+        language: system
+        types: [yaml]
+        files: ^components/.*/controllers/base/release\.yaml$
+      - id: kustomization-validation
+        name: Validate kustomization files
+        entry: sh -c 'kustomize build --enable-alpha-plugins --enable-exec "$(dirname "$1")" >/dev/null'
+        language: system
+        types: [yaml]
+        files: ^components/.*/kustomization\.yaml$

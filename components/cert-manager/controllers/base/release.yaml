@@ -15,6 +15,9 @@ spec:
     crds:
       enabled: true
       keep: false
+    webhook:
+      networkPolicy:
+        enabled: true
     # https://cert-manager.io/docs/usage/gateway/
     # config:
     #   apiVersion: controller.config.cert-manager.io/v1alpha1
