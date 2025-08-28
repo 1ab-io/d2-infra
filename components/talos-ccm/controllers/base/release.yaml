@@ -9,6 +9,7 @@ spec:
     kind: OCIRepository
     name: talos-cloud-controller-manager
   releaseName: talos-cloud-controller-manager
+  # https://github.com/siderolabs/talos-cloud-controller-manager/blob/main/charts/talos-cloud-controller-manager/values.yaml
   values:
     enabledControllers:
       - node-csr-approval
