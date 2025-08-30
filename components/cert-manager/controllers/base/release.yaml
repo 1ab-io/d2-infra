@@ -16,9 +16,9 @@ spec:
       enabled: true
       keep: false
     webhook:
-      hostNetwork: true
+      # hostNetwork: true
       networkPolicy:
-        enabled: true
+        enabled: false # true
     # https://cert-manager.io/docs/usage/gateway/
     # config:
     #   apiVersion: controller.config.cert-manager.io/v1alpha1
