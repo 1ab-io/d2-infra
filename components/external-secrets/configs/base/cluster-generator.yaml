@@ -1,0 +1,116 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/generators.external-secrets.io/clustergenerator_v1alpha1.json
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: password-24 # default
+spec:
+  kind: Password
+  generator:
+    #    Further specs are available:
+    #    acrAccessTokenSpec:
+    #    ecrRAuthorizationTokenSpec:
+    #    fakeSpec:
+    #    gcrAccessTokenSpec:
+    #    githubAccessTokenSpec:
+    #    stsSessionTokenSpec:
+    #    uuidSpec:
+    #    vaultDynamicSecretSpec:
+    #    webhookSpec:
+    passwordSpec:
+      length: 24
+      # digits: 25%
+      # symbols: 25%
+      # symbolCharacters: |
+      #   ~!@#$%^&*()_+`-={}|[]\:"<>?,./
+      # symbolCharacters: "~!@#%^&*_+-=./"
+      symbolCharacters: "~_+-./"
+      noUpper: false
+      allowRepeat: true
+---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: password-32
+spec:
+  kind: Password
+  generator:
+    passwordSpec:
+      length: 32
+      digits: 5
+      symbols: 5
+      symbolCharacters: "~_+-./"
+      noUpper: false
+      allowRepeat: true
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/generators.external-secrets.io/clustergenerator_v1alpha1.json
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: password-42
+spec:
+  kind: Password
+  generator:
+    passwordSpec:
+      length: 42
+      digits: 5
+      symbols: 5
+      symbolCharacters: "~_+-./"
+      noUpper: false
+      allowRepeat: true
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/generators.external-secrets.io/clustergenerator_v1alpha1.json
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: password-64
+spec:
+  kind: Password
+  generator:
+    passwordSpec:
+      length: 64
+      digits: 10
+      symbols: 10
+      symbolCharacters: "~_+-./"
+      noUpper: false
+      allowRepeat: true
+---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: uuid
+spec:
+  kind: UUID
+  generator:
+    uuidSpec: {}
+---
+# AWS Access Key ID: 20 alpha-numeric characters
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: access-key-id
+spec:
+  kind: Password
+  generator:
+    passwordSpec:
+      length: 20
+      digits: 5
+      symbols: 0
+      noUpper: false
+      allowRepeat: true
+---
+# AWS Secret Access Key: 40 alpha-numeric-slash-plus characters
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: ClusterGenerator
+metadata:
+  name: secret-access-key
+spec:
+  kind: Password
+  generator:
+    passwordSpec:
+      length: 40
+      digits: 5
+      symbols: 5
+      symbolCharacters: "+/"
+      noUpper: false
+      allowRepeat: true
