@@ -9,6 +9,7 @@ spec:
     mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
     operation: copy
   ref:
+    # https://github.com/prometheus-community/helm-charts/releases
     tag: "77.13.0" # {"$imagepolicy": "infra:kube-prometheus-stack:tag"}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -37,14 +38,69 @@ spec:
   # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
   values:
     alertmanager:
-      enabled: false
+      enabled: true
+      networkPolicy:
+        enabled: false
+      alertmanagerSpec:
+        resources:
+          requests:
+            cpu: 50m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 300Mi
+    # defaultRules:
+    #   create: true
+    #   rules:
+    #     etcd: true
+    #     kubeProxy: false
+    # env:
+    #   - name: GOMAXPROCS
+    #     valueFrom:
+    #       resourceFieldRef:
+    #         resource: limits.cpu
     prometheus:
+      networkPolicy:
+        enabled: true
+        # flavor: cilium
+        # cilium:
+        #   endpointSelector:
+        #   egress:
+        #   ingress:
+        # egress:
+        #   - ipBlock:
+        #       cidr: 10.96.0.0/16
+        #   - ipBlock:
+        #       cidr: 10.244.0.0/16
+        ingress:
+          - namespaceSelector:
+              matchLabels:
+                app.kubernetes.io/component: ingress-nginx
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/name: ingress-nginx
+        podSelector:
+          matchLabels:
+            app: prometheus
       prometheusSpec:
+        # persistentVolumeClaimRetentionPolicy:
+        #   whenDeleted: Retain
+        #   whenScaled: Retain
         retention: 12h
         resources:
           requests:
             cpu: 200m
-            memory: 200Mi
+            memory: 1Gi
+          limits:
+            memory: 2Gi
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: openebs-hostpath # gluster
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi # 50Gi
         serviceMonitorNamespaceSelector: {}
         serviceMonitorSelector:
           matchLabels:
@@ -53,6 +109,212 @@ spec:
         podMonitorSelector:
           matchLabels:
             app.kubernetes.io/component: monitoring
+
+        #   matchLabels:
+        #     app.kubernetes.io/component: monitoring
+        # https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/monitoring.md#configure-prometheus
+        # https://github.com/cloudnative-pg/charts/issues/302#issuecomment-2136904399
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: selfsigned-issuer
+          nginx.ingress.kubernetes.io/auth-url: "https://$host/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: "https://$host/oauth2/start?rd=$escaped_request_uri"
+          # nginx.ingress.kubernetes.io/auth-snippet: |
+          #     proxy_set_header X-WebAuth-Role Admin;
+          # gethomepage.dev/app: prometheus
+          gethomepage.dev/description: Part of kube-prometheus-stack
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/group: Monitoring
+          gethomepage.dev/href: https://prometheus.${CLUSTER_NAME}.${BASE_DOMAIN}/targets?health=down&pool=
+          gethomepage.dev/icon: prometheus.png
+          # gethomepage.dev/instance: private
+          gethomepage.dev/name: Prometheus
+          gethomepage.dev/pod-selector: ""
+          # gethomepage.dev/weight: 10
+          gethomepage.dev/widget.type: prometheus
+          gethomepage.dev/widget.url: "http://kube-prometheus-stack-prometheus.monitoring:9090"
+        hosts:
+          - &prometheus-host prometheus.${CLUSTER_NAME}.${BASE_DOMAIN}
+        # paths:
+        #   - /
+        tls:
+          - secretName: prometheus-certs # prometheus-general-tls
+            hosts:
+              - *prometheus-host
+    nodeExporter:
+      enabled: true
+      operatingSystems:
+        linux:
+          enabled: true
+        aix:
+          enabled: false
+        darwin:
+          enabled: false
+    prometheus-node-exporter:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 50Mi
+        requests:
+          cpu: 100m
+          memory: 30Mi
+    prometheusOperator:
+      clusterDomain: ${CLUSTER_DOMAIN}
+      networkPolicy:
+        enabled: true
+        # flavor: cilium
+        # cilium:
+        #   egress:
+        # matchLabels: {}
+      # The default webhook port is 10250 in order to work out-of-the-box
+      # in GKE private clusters and avoid adding firewall rules, but conflicts
+      # with metrics-server
+      tls:
+        internalPort: 10251
+      admissionWebhooks:
+        deployment:
+          tls:
+            internalPort: 10251
     grafana:
-      defaultDashboardsEnabled: false
-      adminPassword: flux
+      admin:
+        existingSecret: grafana-admin
+        userKey: user
+        passwordKey: password
+      # adminUser: admin
+      # adminPassword:
+      defaultDashboardsEnabled: true
+      # env:
+      #   GRAFANA_CLIENT_ID: ${grafanaClientID}
+      #   GRAFANA_CLIENT_SECRET: ${grafanaClientSecret}
+      # extraObjects: []
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: selfsigned-issuer
+          # NOTE: exclude 403 (login) / 404 (redirect) / 407-413 (unexpected value?)
+          # nginx.ingress.kubernetes.io/custom-http-errors: 403,405,416,418,429,500,502,503,504,505
+          nginx.ingress.kubernetes.io/custom-http-errors: 405,416,418,429,500,502,503,504,505
+        hosts:
+          - &grafana-host grafana.${CLUSTER_NAME}.${BASE_DOMAIN}
+        # paths:
+        #   - /
+        tls:
+          - secretName: grafana-certs # grafana-general-tls
+            hosts:
+              - *grafana-host
+      persistence:
+        enabled: false # true
+        type: pvc # sts
+        storageClassName: openebs-hostpath
+        accessModes:
+          - ReadWriteOnce
+        size: 2Gi # 20Gi
+        finalizers:
+          - kubernetes.io/pvc-protection
+      serviceMonitor:
+        enabled: true
+      sidecar:
+        alerts:
+          enabled: true
+          label: grafana_alert
+          searchNamespace: ALL
+        dashboards:
+          enabled: true
+          label: grafana_dashboard
+          searchNamespace: ALL
+          enableNewTablePanelSyntax: false
+          folderAnnotation: grafana_folder
+          annotations:
+            grafana_folder: Kube Prometheus Stack
+          # multicluster:
+          #   global:
+          #     enabled: false
+          #   etcd:
+          #     enabled: false
+          provider:
+            allowUiUpdates: true
+            foldersFromFilesStructure: true
+        datasources:
+          enabled: true
+          label: grafana_datasource
+          searchNamespace: ALL
+        plugins:
+          enabled: true
+          label: grafana_plugin
+          searchNamespace: ALL
+        notifiers:
+          enabled: true
+          label: grafana_notifier
+          searchNamespace: ALL
+      # imageRenderer:
+      #   enabled: true
+      #   serviceMonitor:
+      #     enabled: true
+      # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/auth-proxy/
+      grafana.ini:
+        # security:
+        #   disable_brute_force_login_protection: true
+        # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/
+        server:
+          root_url: https://grafana.${CLUSTER_NAME}.${BASE_DOMAIN}
+        # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/generic-oauth/#set-up-oauth2-with-dex
+        auth.generic_oauth:
+          name: Dex
+          enabled: true
+          client_id: $__env{GRAFANA_CLIENT_ID}
+          client_secret: $__env{GRAFANA_CLIENT_SECRET}
+          scopes: openid email profile groups offline_access
+          auth_url: https://dex.${CLUSTER_NAME}.${BASE_DOMAIN}/auth
+          token_url: https://dex.${CLUSTER_NAME}.${BASE_DOMAIN}/token
+          api_url: https://dex.${CLUSTER_NAME}.${BASE_DOMAIN}/userinfo
+          allow_signup: true
+          # auto_login: true
+          tls_skip_verify_insecure: true
+          # role_attribute_path: contains(groups[*], 'admin') && 'Admin' || contains(groups[*], 'editor') && 'Editor' || 'Viewer'
+          # role_attribute_path: contains(roles[*], 'admin') && 'GrafanaAdmin' || 'None'
+          role_attribute_path: contains(groups[*], '${GROUP_NAME}') && 'GrafanaAdmin' || 'None'
+          role_attribute_strict: true
+          allow_assign_grafana_admin: true
+          # FIXME: org must exist and should not contain dashes?
+          # org_attribute_path: groups
+          # org_mapping: org_foo:org_foo:Viewer org_bar:org_bar:Editor *:org_baz:Editor
+
+        # https://tailscale.com/blog/grafana-auth
+        # https://tailscale.com/kb/1312/serve#identity-headers
+        auth.proxy:
+          enabled: false # FIXME: redirect loop
+          header_name: Tailscale-User-Login # X-WebAuth-User
+          header_property: username # email
+          auto_sign_up: true
+          sync_ttl: 60
+          # FIXME: https://github.com/grafana/grafana/issues/101117
+          # whitelist: 127.0.0.1, 100.64.0.0/10
+          # 192.168.1.1, 192.168.1.0/24, 2001::23, 2001::0/120
+          # https://github.com/grafana/grafana/issues/8816#issuecomment-2034080861
+          headers: Name:Tailscale-User-Name Pic:Tailscale-User-Profile-Pic
+          # TODO: Role:Tailscale-User-Role
+          # Name:X-WebAuth-Name Role:X-WebAuth-Role Email:X-WebAuth-Email Groups:X-WebAuth-Groups
+          enable_login_token: true
+      # additionalDatasources:
+      #   # https://grafana.com/docs/plugins/grafana-cloudflare-datasource/latest/
+      #   - name: Cloudflare
+      #     type: grafana-cloudflare-datasource
+      #     secureJsonData:
+      #       cloudflare.token: ${CLOUDFLARE_API_KEY}
+    kubeEtcd:
+      # Specify IPs if etcd is not deployed as a pod
+      # TODO: handle multiple nodes
+      endpoints:
+        - ${IPV4_ADDRESS}
+      # service:
+      #   port: 2381
+      #   targetPort: 2381
+    kubeProxy:
+      enabled: false
