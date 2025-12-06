@@ -15,7 +15,7 @@ spec:
       enabled: true
       keep: false
     webhook:
-      # hostNetwork: true
+      hostNetwork: false
       networkPolicy:
         enabled: false # true
     # https://cert-manager.io/docs/usage/gateway/

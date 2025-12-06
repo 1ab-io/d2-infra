@@ -1,3 +1,5 @@
+# TODO: move to kube-system
+---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
@@ -25,3 +27,9 @@ spec:
   values:
     args:
       - --kubelet-insecure-tls
+    hostNetwork:
+      enabled: false
+    # resources:
+    #   requests:
+    #     cpu: 100m
+    #     memory: 200Mi
