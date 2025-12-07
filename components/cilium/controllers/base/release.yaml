@@ -82,8 +82,8 @@ spec:
     k8sNetworkPolicy:
       enabled: true
 
-    k8sServiceHost: localhost
-    k8sServicePort: 7445
+    k8sServiceHost: ${KUBERNETES_SERVICE_HOST}
+    k8sServicePort: ${KUBERNETES_SERVICE_PORT}
 
     nodePort:
       enabled: true
