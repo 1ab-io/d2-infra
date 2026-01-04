@@ -31,3 +31,15 @@ spec:
         type: RuntimeDefault
     # tolerations:
     #   - key: node.kubernetes.io/network-unavailable
+    web:
+      ingress:
+        enabled: true
+        className: nginx
+        annotations:
+          cert-manager.io/cluster-issuer: selfsigned-issuer
+        hosts:
+          - &gitops-host gitops.${CLUSTER_NAME}.${BASE_DOMAIN}
+        tls:
+          - secretName: gitops-certs
+            hosts:
+              - *gitops-host
