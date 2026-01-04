@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: velero
-      version: "11.3.1" # {"$imagepolicy": "velero:velero:tag"}
+      version: "11.3.1" # {"$imagepolicy": "vmware-tanzu:velero:tag"}
       sourceRef:
         kind: HelmRepository
         name: vmware-tanzu
@@ -142,3 +142,9 @@ spec:
     backupsEnabled: true
     # Whether to create volumesnapshotlocation crd, if false => disable snapshot feature
     snapshotsEnabled: true
+
+    # WARN: bitnamilegacy/kubectl:1.34: not found
+    # https://github.com/vmware-tanzu/helm-charts/issues/698
+    kubectl:
+      image:
+        tag: v1.33
