@@ -210,7 +210,7 @@ spec:
             hosts:
               - *grafana-host
       persistence:
-        enabled: false # true
+        enabled: true
         type: pvc # sts
         storageClassName: openebs-hostpath
         accessModes:

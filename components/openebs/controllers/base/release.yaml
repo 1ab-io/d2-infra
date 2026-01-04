@@ -1,0 +1,143 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: openebs
+spec:
+  interval: 1h
+  timeout: 5m
+  chart:
+    spec:
+      chart: openebs
+      # https://github.com/openebs/openebs/releases
+      version: "4.4.0" # {"$imagepolicy": "openebs:openebs:tag"}
+      sourceRef:
+        kind: HelmRepository
+        name: openebs
+  releaseName: openebs
+  # https://openebs.io/docs/quickstart-guide/installation
+  # https://github.com/openebs/openebs/blob/develop/charts/values.yaml
+  values:
+    localpv-provisioner:
+      rbac:
+        create: true
+    # https://github.com/openebs/mayastor-extensions/blob/develop/chart/values.yaml
+    mayastor:
+      apis:
+        rest:
+          healthProbes:
+            liveness:
+              enabled: true
+            readiness:
+              enabled: true
+      base:
+        logging:
+          format: pretty # pretty, json or compact
+          silenceLevel:
+        metrics:
+          enabled: true
+      csi:
+        node:
+          # Disable the init container that checks for the nvme_tcp module
+          initContainers:
+            enabled: false
+      # https://github.com/bitnami/charts/blob/main/bitnami/etcd/values.yaml
+      etcd:
+        # clusterDomain: ${CLUSTER_DOMAIN}
+        # client:
+        #   secureTransport: true
+        #   useAutoTlS: true
+        # peer:
+        #   secureTransport: true
+        #   useAutoTlS: true
+        livenessProbe:
+          enabled: false
+        readinessProbe:
+          enabled: false
+        localpvScConfig:
+          enabled: false
+          name: mayastor-etcd-localpv
+        logLevel: info # debug, info, warn, error, panic or fatal
+        persistence:
+          enabled: true
+          storageClass: openebs-hostpath # mayastor-etcd-localpv
+          size: "2G"
+        replicaCount: 1
+      eventing:
+        enabled: false # true
+      io_engine:
+        logLevel: info
+        # https://github.com/openebs/mayastor/issues/1133
+        envcontext: iova-mode=pa
+        nodeSelector:
+          openebs.io/engine: mayastor
+          kubernetes.io/arch: amd64
+        resources:
+          limits:
+            cpu: "1" # "2"
+            hugepages-2Mi: 2Gi
+            memory: 1Gi
+          requests:
+            cpu: 200m # "2"
+            hugepages-2Mi: 2Gi
+            memory: 1Gi
+        cpuCount: "1" # "2"
+      localpv-provisioner:
+        enabled: false
+        analytics:
+          enabled: false
+      loki-stack:
+        enabled: false
+        localpvScConfig:
+          enabled: false
+        loki:
+          enabled: false
+          persistence:
+            enabled: true
+            storageClassName: openebs-hostpath # mayastor-loki-localpv
+        promtail:
+          enabled: false # true
+          config:
+            clients:
+              - url: http://loki.monitoring:3100/loki/api/v1/push
+      nats:
+        cluster:
+          enabled: false # true
+          replicas: 1
+        # FQDN (nats-0.nats.default.svc.cluster.local) or short name (nats-0.nats.default)
+        useFQDN: false
+      obs:
+        callhome:
+          enabled: false
+        stats:
+          logLevel: info
+      storageClass:
+        enabled: true
+        nameSuffix: single-replica
+    # Disable LVM and ZFS engines
+    engines:
+      local:
+        lvm:
+          enabled: false
+        zfs:
+          enabled: false
+      replicated:
+        mayastor:
+          enabled: false # true
+  # postRenderers:
+  #   - kustomize:
+  #       patches:
+  #         - target:
+  #             kind: StatefulSet
+  #             name: openebs-etcd # mayastor-etcd
+  #           patch: |
+  #             - op: replace
+  #               path: /spec/replicas
+  #               value: 1
+  #         - target:
+  #             kind: StatefulSet
+  #             name: openebs-nats
+  #           patch: |
+  #             - op: replace
+  #               path: /spec/replicas
+  #               value: 1
