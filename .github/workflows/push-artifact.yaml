@@ -15,7 +15,7 @@ jobs:
           - cert-manager
           - cilium
           - external-secrets
-          - flux-operator
+          # - flux-operator
           - github-runner
           - gitlab-agent
           - gitlab-runner

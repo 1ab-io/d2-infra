@@ -9,7 +9,7 @@ rm -fr manifests.out manifests
 mkdir -p manifests.out manifests
 
 # chart="${{ matrix.component }}"
-for chart in cert-manager cilium external-secrets flux-operator talos-ccm; do
+for chart in cert-manager cilium external-secrets talos-ccm; do
   # TODO: https://github.com/fluxcd/flux2/issues/2808
   # controller_ks="components/$chart/controllers/$environment/kustomization.yaml"
   repo_file="components/$chart/controllers/base/repository.yaml"
