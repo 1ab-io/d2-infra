@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: external-secrets
-      version: "*"
+      version: "1.2.1" # {"$imagepolicy": "external-secrets:external-secrets:tag"}
       sourceRef:
         kind: HelmRepository
         name: external-secrets
