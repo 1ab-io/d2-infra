@@ -7,7 +7,7 @@ spec:
   interval: 1h
   chartRef:
     kind: OCIRepository
-    name: flux-operator-chart # controlplaneio-fluxcd
+    name: flux-operator # -chart # controlplaneio-fluxcd
   releaseName: flux-operator
   # https://github.com/controlplaneio-fluxcd/charts/blob/main/charts/flux-operator/values.yaml
   values:
