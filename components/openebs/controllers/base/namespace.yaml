@@ -1,3 +1,4 @@
+# FIXME: override resource set
 ---
 apiVersion: v1
 kind: Namespace
